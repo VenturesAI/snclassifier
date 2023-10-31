@@ -1,0 +1,34 @@
+{% extends "snclassifier_djangoapp/layout.html" %}
+{% block title %}
+Youtube comments
+{% endblock %}
+{% block content %}
+    <h2>Logged youtube comments</h2>
+
+    {% if comments_list %}
+        <table class="comments_list">
+            <thead>
+            <tr>
+                <th>date</th>
+                <th>time</th>
+                <th>author</th>
+                <th>text</th>
+                <th>link</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for comment in comments_list %}
+                <tr>
+                    <td>{{ comment.date | date:'d M Y' }}</td>
+                    <td>{{ comment.date | time:'H:i:s' }}</td>
+                    <td>{{ comment.author }}</td>
+                    <td>{{ comment.text }}</td>
+                    <td>{{ comment.video_link }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No comments have been logged. Use the <a href="{% url 'log' %}">Log Message form</a>.</p>
+    {% endif %}
+{% endblock %}
