@@ -1,7 +1,3 @@
-.message {
-    font-weight: 600;
-    color: blue;
-}
 .scroll {
     padding: 5px;
     margin-top: 2px;
@@ -10,7 +6,7 @@
     font: 24px/36px sans-serif;
     font-size: 5px;
     border: 2px solid rgb(181, 178, 178);
-    width: 600px;
+    width: 500px;
     height: 1000px;
     overflow-y: scroll;
 }
@@ -39,7 +35,7 @@
     flex-wrap: wrap;
 }
 .column {
-    display: flex;
+    display:flex;
     flex-direction: column;
 }
 

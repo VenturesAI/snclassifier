@@ -1,7 +1,15 @@
 {% extends "snclassifier_djangoapp/layout.html" %}
 {% block title %}
-About us
+    About us
 {% endblock %}
 {% block content %}
-<p>About page for the Visual Studio Code Django tutorial.</p>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'snclassifier_djangoapp/about.css' %}"/>
+    <p>
+        The YouTube Classifier project is a collaborative effort between Danil Nemtsev and Pavel Molchanov. This innovative application is designed to categorize YouTube comments into three distinct groups: positive, neutral, and negative.
+        The primary objective of this project is to offer a valuable tool for marketing research and audience analysis. The application's core functionality involves processing and analyzing the sentiment expressed in YouTube comments. By classifying comments into these three categories,
+        the YouTube Classifier empowers content creators, marketing professionals, and researchers to gain valuable insights into the sentiment of their audience. One of the key use cases of this tool is in marketing research, as it provides an efficient way to gauge the overall sentiment
+        surrounding a particular channel or content creator. By understanding the sentiment of their audience, marketers can tailor their strategies and content to better engage and connect with viewers.
+        In addition, the YouTube Classifier enables the identification of trends and patterns in the comments section, which can further enhance content strategy and audience engagement. This project is a valuable asset for anyone looking to harness the power of sentiment analysis on YouTube and make data-driven decisions to foster a loyal and engaged online community.
+    </p>
 {% endblock %}
