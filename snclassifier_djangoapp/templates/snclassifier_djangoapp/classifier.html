@@ -1,0 +1,114 @@
+{% extends "snclassifier_djangoapp/layout.html" %}
+{% block title %}
+    Home
+{% endblock %}
+{% block content %}
+<!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <title>youtube classifier</title>
+            {% load static %}
+            <link rel="stylesheet" type="text/css" href="{% static 'snclassifier_djangoapp/classifier.css' %}"/>
+
+            <script>
+                const csrfToken = "{{ csrf_token }}";
+                document.addEventListener("DOMContentLoaded", function() {
+                    const overlay = document.getElementById('overlay');
+                    const spinner = document.getElementById('spinner');
+
+                    function showOverlay() {
+                    overlay.style.display = 'flex';
+                    }
+
+                    function hideOverlay() {
+                    overlay.style.display = 'none';
+                    }
+
+                    function showSpinner() {
+                    showOverlay();
+                    spinner.style.display = 'block';
+                    }
+
+                    function hideSpinner() {
+                    hideOverlay();
+                    spinner.style.display = 'none';
+                    }
+
+                    document.getElementById("myForm").addEventListener("submit", function(event) {
+                        showSpinner();
+                        event.preventDefault();
+                        const userInput = document.getElementById("userInput").value;
+
+                        fetch('/process_data/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': csrfToken,  // Make sure to include the CSRF token
+                            },
+                            body: JSON.stringify({ user_input: userInput })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+
+                            // Process the data and update the frontend
+                            const negativeDiv = document.getElementById("negativeDiv");
+                            const neutralDiv = document.getElementById("neutralDiv");
+                            const positiveDiv = document.getElementById("positiveDiv");
+
+                            // Select the second list (index 1) from listOfLists
+                            const negativeList = data[0];
+                            const neutralList = data[1];
+                            const positiveList = data[2];
+                            const procent0 = data[3]
+                            const procent1 = data[4]
+                            const procent2 = data[5]
+
+                            // Join the selected list values into a string for display, e.g., separated by commas
+                            const negjoinedValues = negativeList.join("<br><br>");
+                            const neujoinedValues = neutralList.join("<br><br>");
+                            const posjoinedValues = positiveList.join("<br><br>");
+
+                            // Update the content of the <div> with the joined values
+                                negativeDiv.innerHTML = negjoinedValues;
+                                neutralDiv.innerHTML = neujoinedValues;
+                                positiveDiv.innerHTML = posjoinedValues;
+                                document.getElementById("negative_title").innerHTML = "negative &#x1F922 (" + procent0 + "%)";
+                                document.getElementById("neutral_title").innerHTML = "neitral &#x1F610 (" + procent1 + "%)";
+                                document.getElementById("positive_title").innerHTML = "positive &#x1F604 (" + procent2 + "%)";
+
+                            document.getElementById("userInput").value = "";
+                            hideSpinner();
+                        });
+                    });
+                });
+            </script>
+        </head>
+        <body>
+            <h1>Youtube classifier</h1>
+            <p>Get insights about youtube english comments sentiment. </p>
+            <p>Place youtube video link in a section bellow and get comments assessment (negative &#x1F922, neitral &#x1F610, positive &#x1F604) </p>
+            <form id="myForm">
+                <input type="text" placeholder="place link here" id="userInput">
+                <input type="submit" value="Submit">
+            </form>
+            <div id="overlay" class="overlay">
+                <div id="spinner" class="spinner">
+                </div>
+            </div>
+            <div id="container">
+                <div class="column">
+                    <h3 class="column_title" id="negative_title">negative &#x1F922</h3>
+                    <div id="negativeDiv" class="scroll" style="font-size: 16px; font: sans-serif;"></div>
+                </div>
+                <div class="column">
+                    <h3 class="column_title" id="neutral_title">neitral &#x1F610</h3>
+                    <div id="neutralDiv" class="scroll"  style="font-size: 16px; font: sans-serif;"></div>
+                </div>
+                <div class="column">
+                    <h3 class="column_title" id="positive_title">positive &#x1F604</h3>
+                    <div id="positiveDiv" class="scroll"  style="font-size: 16px; font: sans-serif;"></div>
+                </div>
+            </div>
+        </body>
+    </html>
+{% endblock %}
