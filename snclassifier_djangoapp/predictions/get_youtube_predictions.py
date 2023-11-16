@@ -6,9 +6,6 @@ import pandas as pd
 from langdetect import detect
 import re
 
-filepath = "backend/predictions/datasets/comments.csv"
-comments= pd.read_csv(filepath)
-
 def preprocess_data(df):
     #delete empty rows
     df = df.dropna()
