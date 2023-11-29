@@ -4,7 +4,7 @@ import pandas as pd
 
 api_key = "AIzaSyCKXIwPV2bgtOqdn2l1RXaQmdOgMwsenyI"
 
-def get_video_comments(youtube_link):
+def get_video_comments(youtube_link, max_comments=700):
     print(f'youtube_link = {youtube_link}')
     # Extract the video ID from the YouTube link
     video_id = re.search(r'(?<=v=)[^&]+', youtube_link)
@@ -21,7 +21,7 @@ def get_video_comments(youtube_link):
     # Request video comments
     comments = []
     nextPageToken = None
-    while True:
+    while len(comments) < max_comments:
         response = youtube.commentThreads().list(
             part='snippet',
             videoId=video_id,
