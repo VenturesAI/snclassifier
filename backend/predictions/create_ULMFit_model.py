@@ -5,41 +5,16 @@ from langdetect import detect
 import re
 from django.conf import settings
 
-CSV_FILE_PATH = settings.BASE_DIR / "backend/predictions/datasets/comments.csv"
+CSV_FILE_PATH = "/home/nds/projects/snclassifier/snclassifier/backend/predictions/datasets/comments.csv"
 
 comments = pd.read_csv(CSV_FILE_PATH)
 
 def preprocess_data(df):
-    #delete empty rows
-    df = df.dropna()
+    #delete empty rows, delete duplicates
+    df = df.dropna().drop_duplicates()
 
-    #delete duplicates
-    df = df.drop_duplicates()
-
-    df["Comment"] = df["Comment"].tolist()
-
-    #get only english comments
-    def detect_language(text):
-        try:
-            return detect(text)
-        except:
-            return None  # In case of errors during language detection
-    # Apply the language detection function to the 'text' column and create a new 'language' column
-    df["language"] = df["Comment"].apply(detect_language)
-
-    # Filter and get only rows where the detected language is English ('en')
-    df = df[df['language'] == 'en']
-
-    # Drop the 'language' column, you no longer need it
-    df = df.drop(columns=['language'])
-
-
-    #Clean data from hashtags,links and URLs
-    def cleaning(Comment):
-        Comment = re.sub(r'#\w+','', Comment)                 # Removing Hashtags
-        Comment = re.sub(r'http\S+','', Comment)              # Removing Links & URLs
-        Comment = re.sub(r'@\w+','', Comment)                 # Removing Mentions
-        return Comment
+    df["Comment"] = df["Comment"].str.lower()
+    df["Comment"] = df["Comment"].str.replace(r'#\w+', '').str.replace(r'http\S+', '').str.replace(r'@\w+', '')
 
     # Defining list of Abbreviations to be expanded to its original form
     abbreviations = {'fyi': 'for your information',
@@ -65,16 +40,10 @@ def preprocess_data(df):
                  'frfr':'for real for real',
                  'istg':'i swear to god',}
 
-    def data_cleaning(df):
-        df["Comment"] = df["Comment"].apply(cleaning)     # Calling cleaning function (1-7)
-        df["Comment"] = df["Comment"].str.lower()         # Normalize all characters to lowercase
-        for short_form, full_form in abbreviations.items(): # Expanding the Abbreviations
-            df["Comment"] = df["Comment"].str.replace(short_form, full_form)
-        return df
-    #Clean data from hashtags,links and URLs
-    df = data_cleaning(df)
-    df = df.sample(frac=1, random_state=42)
 
+    for short_form, full_form in abbreviations.items(): # Expanding the Abbreviations
+        df["Comment"] = df["Comment"].str.replace(short_form, full_form)
+    df = df.sample(frac=1, random_state=42)
     return df
 
 comment_2 = preprocess_data(comments)
@@ -118,4 +87,4 @@ predictions = learn_2.get_preds(dl=learn_2.dls.test_dl(comment_2["Comment"].iloc
 predicted_classes = predictions[0].argmax(dim=1)
 print(predicted_classes)
 
-learn_2.export('backend/predictions/saved_ml_models/ULMFiT_model.pkl')
+learn_2.export('/home/nds/projects/snclassifier/snclassifier/backend/predictions/saved_ml_models/ULMFiT_model.pkl')

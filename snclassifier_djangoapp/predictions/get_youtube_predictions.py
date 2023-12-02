@@ -6,86 +6,59 @@ import pandas as pd
 from langdetect import detect
 import re
 
-def preprocess_data(df):
-    #delete empty rows
-    df = df.dropna()
+class YouTubePredictor:
+    def __init__(self, model_path='backend/predictions/saved_ml_models/ULMFiT_model.pkl'):
+        # Load the model during initialization
+        self.learn = load_learner(model_path)
 
-    #delete duplicates
-    df = df.drop_duplicates()
+    def preprocess_data(self, df):
+        #delete empty rows
+        df = df.dropna().drop_duplicates()
+        df["Comment"] = df["Comment"].str.lower()
 
-    df["Comment"] = df["Comment"].tolist()
+        # Vectorized cleaning
+        df["Comment"] = df["Comment"].str.replace(r'#\w+', '').str.replace(r'http\S+', '').str.replace(r'@\w+', '')
 
-    #get only english comments
-    def detect_language(text):
-        try:
-            return detect(text)
-        except:
-            return None  # In case of errors during language detection
-    # Apply the language detection function to the 'text' column and create a new 'language' column
-    df["language"] = df["Comment"].apply(detect_language)
+        # Defining list of Abbreviations to be expanded to its original form
+        abbreviations = {'fyi': 'for your information',
+                    'lol': 'laugh out loud',
+                    'loza': 'laughs out loud',
+                    'lmao': 'laughing',
+                    'rofl': 'rolling on the floor laughing',
+                    'vbg': 'very big grin',
+                    'xoxo': 'hugs and kisses',
+                    'xo': 'hugs and kisses',
+                    'brb': 'be right back',
+                    'tyt': 'take your time',
+                    'thx': 'thanks',
+                    'abt': 'about',
+                    'bf': 'best friend',
+                    'diy': 'do it yourself',
+                    'faq': 'frequently asked questions',
+                    'fb': 'facebook',
+                    'idk': 'i don\'t know',
+                    'asap': 'as soon as possible',
+                    'syl': 'see you later',
+                    'nvm': 'never mind',
+                    'frfr':'for real for real',
+                    'istg':'i swear to god',}
 
-    # Filter and get only rows where the detected language is English ('en')
-    df = df[df['language'] == 'en']
 
-    # Drop the 'language' column, you no longer need it
-    df = df.drop(columns=['language'])
-
-    #Clean data from hashtags,links and URLs
-    def cleaning(Comment):
-        Comment = re.sub(r'#\w+','', Comment)                 # Removing Hashtags
-        Comment = re.sub(r'http\S+','', Comment)              # Removing Links & URLs
-        Comment = re.sub(r'@\w+','', Comment)                 # Removing Mentions
-        return Comment
-
-    # Defining list of Abbreviations to be expanded to its original form
-    abbreviations = {'fyi': 'for your information',
-                 'lol': 'laugh out loud',
-                 'loza': 'laughs out loud',
-                 'lmao': 'laughing',
-                 'rofl': 'rolling on the floor laughing',
-                 'vbg': 'very big grin',
-                 'xoxo': 'hugs and kisses',
-                 'xo': 'hugs and kisses',
-                 'brb': 'be right back',
-                 'tyt': 'take your time',
-                 'thx': 'thanks',
-                 'abt': 'about',
-                 'bf': 'best friend',
-                 'diy': 'do it yourself',
-                 'faq': 'frequently asked questions',
-                 'fb': 'facebook',
-                 'idk': 'i don\'t know',
-                 'asap': 'as soon as possible',
-                 'syl': 'see you later',
-                 'nvm': 'never mind',
-                 'frfr':'for real for real',
-                 'istg':'i swear to god',}
-
-    def data_cleaning(df):
-        df["Comment"] = df["Comment"].apply(cleaning)     # Calling cleaning function (1-7)
-        df["Comment"] = df["Comment"].str.lower()         # Normalize all characters to lowercase
         for short_form, full_form in abbreviations.items(): # Expanding the Abbreviations
             df["Comment"] = df["Comment"].str.replace(short_form, full_form)
         return df
-    #Clean data from hashtags,links and URLs
-    df = data_cleaning(df)
-    df = df.sample(frac=1, random_state=42)
 
-    return df
+    def get_youtube_predictions(self, comments):
+        #preprocess imput data
+        comments = self.preprocess_data(comments)
+        comments = comments.sample(frac=1, random_state=42).reset_index(drop=True)
 
-def get_youtube_predictions(comments):
-    #Load parts of trained model
-    learn = load_learner('backend/predictions/saved_ml_models/ULMFiT_model.pkl')
-    #preprocess imput data, load input dataframe in fastai dataloader(test_dl)
-    comments = preprocess_data(comments)
-    comments = comments.reset_index(drop=True)
-    test_dl = learn.dls.test_dl(comments["Comment"])
+        #load input dataframe in fastai dataloader(test_dl)
+        test_dl = self.learn.dls.test_dl(comments["Comment"])
 
-    #Make prediction
-    preds, _ = learn.get_preds(dl=test_dl)
-    predicted_classes = preds.argmax(dim=1)
-    numpy_array = predicted_classes.numpy()
-    pred_dataframe = pd.DataFrame(numpy_array, columns=["Preds"])
-    comments["Predictions"] = pred_dataframe["Preds"]
+        #Make prediction
+        preds, _ = self.learn.get_preds(dl=test_dl)
+        predicted_classes = preds.argmax(dim=1)
+        comments["Predictions"] = predicted_classes.numpy()
 
-    return comments
+        return comments
