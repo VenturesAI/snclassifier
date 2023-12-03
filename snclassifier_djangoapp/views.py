@@ -2,7 +2,6 @@ from django.shortcuts import render
 
 from django.http import JsonResponse
 
-
 from django.views.generic import ListView
 
 def home(request):
@@ -15,11 +14,13 @@ def contact(request):
     return render(request, "snclassifier_djangoapp/contact.html")
 
 from .parser.parser import get_video_comments
-from .predictions.get_youtube_predictions import get_youtube_predictions
+from snclassifier_djangoapp.predictions.get_youtube_predictions import YouTubePredictor
 from django.views.decorators.csrf import csrf_exempt
 import json
+predictor = YouTubePredictor()
 
 def index(request):
+
     return render(request, 'snclassifier_djangoapp/classifier.html')
 
 @csrf_exempt
@@ -31,7 +32,7 @@ def process_data(request):
 
         # Process user_input here
         comments = get_video_comments(user_input)
-        comments = get_youtube_predictions(comments)
+        comments = predictor.get_youtube_predictions(comments)
 
         list_0 = []
         list_1 = []
