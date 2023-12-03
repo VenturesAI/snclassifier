@@ -27,7 +27,7 @@ SECRET_KEY = 's$n!k*bsa_*n2al!cpfnq^9rbk_85%ix8o=3cn+8p+p0)$9)3('
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['www.commentsclassifier.site']
 
 
 # Application definition
