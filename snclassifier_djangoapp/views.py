@@ -17,7 +17,7 @@ from .parser.parser import get_video_comments
 from snclassifier_djangoapp.predictions.get_youtube_predictions import YouTubePredictor
 from django.views.decorators.csrf import csrf_exempt
 import json
-predictor = YouTubePredictor()
+
 
 def index(request):
 
@@ -31,6 +31,7 @@ def process_data(request):
         user_input = data['user_input']
 
         # Process user_input here
+        predictor = YouTubePredictor()
         comments = get_video_comments(user_input)
         comments = predictor.get_youtube_predictions(comments)
 
