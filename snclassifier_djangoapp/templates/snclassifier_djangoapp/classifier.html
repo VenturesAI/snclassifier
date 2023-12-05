@@ -94,11 +94,11 @@
         </head>
         <body>
             <h1>Youtube classifier</h1>
-            <p>Get insights about youtube english comments sentiment. </p>
-            <p>Place youtube video link in a section bellow and get comments assessment (negative &#x1F922, neitral &#x1F610, positive &#x1F604) </p>
+            <p>Get insights about YouTube English comments sentiment (restricted by 300 comments) </p>
+            <p>Place the YouTube video link in a section below and get comments assessment (negative &#x1F922, neutral &#x1F610, positive &#x1F604) </p>
             <form id="myForm">
                 <input type="text" placeholder="place link here" id="userInput">
-                <input type="submit" value="Submit">
+                <input class="submit_link" type="submit" value="Submit">
             </form>
             <div id="overlay" class="overlay">
                 <div id="spinner" class="spinner">
@@ -110,7 +110,7 @@
                     <div id="negativeDiv" class="scroll" style="font-size: 16px; font: sans-serif;"></div>
                 </div>
                 <div class="column">
-                    <h3 class="column_title" id="neutral_title">neitral &#x1F610</h3>
+                    <h3 class="column_title" id="neutral_title">neutral &#x1F610</h3>
                     <div id="neutralDiv" class="scroll"  style="font-size: 16px; font: sans-serif;"></div>
                 </div>
                 <div class="column">
