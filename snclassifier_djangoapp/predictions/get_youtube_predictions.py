@@ -48,15 +48,16 @@ class YouTubePredictor:
             df["Comment"] = df["Comment"].str.replace(short_form, full_form)
         return df
 
-    def get_youtube_predictions(self, comments):
-        #preprocess imput data
+    
+    def get_youtube_predictions(self, comments, batch_size=32):
+        # preprocess input data
         comments = self.preprocess_data(comments)
         comments = comments.sample(frac=1, random_state=42).reset_index(drop=True)
 
-        #load input dataframe in fastai dataloader(test_dl)
-        test_dl = self.learn.dls.test_dl(comments["Comment"])
+        # load input dataframe in FastAI dataloader (test_dl) with the specified batch size
+        test_dl = self.learn.dls.test_dl(comments["Comment"], bs=batch_size)
 
-        #Make prediction
+        # Make prediction
         preds, _ = self.learn.get_preds(dl=test_dl)
         predicted_classes = preds.argmax(dim=1)
         comments["Predictions"] = predicted_classes.numpy()
