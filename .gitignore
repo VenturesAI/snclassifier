@@ -4,9 +4,6 @@ __pycache__/
 *.pyc
 db.sqlite3
 *.pkl
-<<<<<<< Updated upstream
 .env
-=======
 gunicorn_conf.py
 myprojectenv/
->>>>>>> Stashed changes
