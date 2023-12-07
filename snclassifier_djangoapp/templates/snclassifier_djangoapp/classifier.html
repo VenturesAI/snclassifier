@@ -6,14 +6,25 @@
 <!DOCTYPE html>
     <html lang="en">
         <head>
-            
-        <!-- Google Tag Manager -->
-        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-        })(window,document,'script','dataLayer','GTM-PGW9GLRQ');</script>
-        <!-- End Google Tag Manager -->
+
+            <!-- Google Tag Manager -->
+            <script>
+                (function(w,d,s,l,i) {
+                    w[l] = w[l]||[];
+                    w[l].push({
+                        'gtm.start': new Date().getTime(),
+                        event:'gtm.js'
+                    });
+                    var f = d.getElementsByTagName(s)[0],
+                    j = d.createElement(s),
+                    dl = l!='dataLayer' ? '&l='+l : '';
+                    j.async = true;
+                    j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+                    f.parentNode.insertBefore(j,f);
+                })
+                (window,document,'script','dataLayer','GTM-PGW9GLRQ');
+            </script>
+            <!-- End Google Tag Manager -->
 
             <title>youtube classifier</title>
             {% load static %}
@@ -26,21 +37,21 @@
                     const spinner = document.getElementById('spinner');
 
                     function showOverlay() {
-                    overlay.style.display = 'flex';
+                        overlay.style.display = 'flex';
                     }
 
                     function hideOverlay() {
-                    overlay.style.display = 'none';
+                        overlay.style.display = 'none';
                     }
 
                     function showSpinner() {
-                    showOverlay();
-                    spinner.style.display = 'block';
+                        showOverlay();
+                        spinner.style.display = 'block';
                     }
 
                     function hideSpinner() {
-                    hideOverlay();
-                    spinner.style.display = 'none';
+                        hideOverlay();
+                        spinner.style.display = 'none';
                     }
 
                     document.getElementById("myForm").addEventListener("submit", function(event) {
@@ -58,32 +69,30 @@
                         })
                         .then(response => response.json())
                         .then(data => {
-
                             // Process the data and update the frontend
                             const negativeDiv = document.getElementById("negativeDiv");
                             const neutralDiv = document.getElementById("neutralDiv");
                             const positiveDiv = document.getElementById("positiveDiv");
 
-                            // Select the second list (index 1) from listOfLists
                             const negativeList = data[0];
                             const neutralList = data[1];
                             const positiveList = data[2];
-                            const procent0 = data[3]
-                            const procent1 = data[4]
-                            const procent2 = data[5]
+                            const procent0 = data['percentages'][0] || 0;
+                            const procent1 = data['percentages'][1] || 0;
+                            const procent2 = data['percentages'][2] || 0;
 
-                            // Join the selected list values into a string for display, e.g., separated by commas
-                            const negjoinedValues = negativeList.join("<br><br>");
-                            const neujoinedValues = neutralList.join("<br><br>");
-                            const posjoinedValues = positiveList.join("<br><br>");
+                            // Join the selected list values into a string for displaying
+                            const negativeJoinedValues = negativeList?.join("<br><br>");
+                            const neutralJoinedValues = neutralList?.join("<br><br>");
+                            const positiveJoinedValues = positiveList?.join("<br><br>");
 
                             // Update the content of the <div> with the joined values
-                                negativeDiv.innerHTML = negjoinedValues;
-                                neutralDiv.innerHTML = neujoinedValues;
-                                positiveDiv.innerHTML = posjoinedValues;
-                                document.getElementById("negative_title").innerHTML = "negative &#x1F922 (" + procent0 + "%)";
-                                document.getElementById("neutral_title").innerHTML = "neitral &#x1F610 (" + procent1 + "%)";
-                                document.getElementById("positive_title").innerHTML = "positive &#x1F604 (" + procent2 + "%)";
+                            negativeDiv.innerHTML = negativeJoinedValues || '';
+                            neutralDiv.innerHTML = neutralJoinedValues || '';
+                            positiveDiv.innerHTML = positiveJoinedValues || '';
+                            document.getElementById("negative_title").innerHTML = "negative &#x1F922 (" + procent0 + "%)";
+                            document.getElementById("neutral_title").innerHTML = "neitral &#x1F610 (" + procent1 + "%)";
+                            document.getElementById("positive_title").innerHTML = "positive &#x1F604 (" + procent2 + "%)";
 
                             document.getElementById("userInput").value = "";
                             hideSpinner();
@@ -94,7 +103,7 @@
         </head>
         <body>
             <h1>Youtube classifier</h1>
-            <p>Get insights about YouTube English comments sentiment (restricted by 300 comments) </p>
+            <p>Get insights about YouTube English comments sentiment</p>
             <p>Place the YouTube video link in a section below and get comments assessment (negative &#x1F922, neutral &#x1F610, positive &#x1F604) </p>
             <form id="myForm">
                 <input type="text" placeholder="place link here" id="userInput">
@@ -119,8 +128,14 @@
                 </div>
             </div>
             <!-- Google Tag Manager (noscript) -->
-            <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PGW9GLRQ"
-            height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+            <noscript>
+                <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PGW9GLRQ"
+                        height="0"
+                        width="0"
+                        style="display:none; visibility:hidden"
+                >
+                </iframe>
+            </noscript>
             <!-- End Google Tag Manager (noscript) -->
         </body>
     </html>
