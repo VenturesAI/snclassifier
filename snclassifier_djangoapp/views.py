@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 from django.http import JsonResponse
 
-from django.views.generic import ListView
+from collections import defaultdict
 
 def home(request):
     return render(request, "snclassifier_djangoapp/home.html")
@@ -20,12 +20,10 @@ import json
 predictor = YouTubePredictor()
 
 def index(request):
-
     return render(request, 'snclassifier_djangoapp/classifier.html')
 
 @csrf_exempt
 def process_data(request):
-    print('process_data')
     if request.method == 'POST':
         data = json.loads(request.body)
         user_input = data['user_input']
@@ -34,31 +32,20 @@ def process_data(request):
         comments = get_video_comments(user_input)
         comments = predictor.get_youtube_predictions(comments)
 
-        list_0 = []
-        list_1 = []
-        list_2 = []
-        common_list = []
+        # Using defaultdict for storaging comments depending on predictions
+        comment_dict = defaultdict(list)
 
-        # Iterate through the DataFrame and distribute comments based on "Prediction" value
         for index, row in comments.iterrows():
             comment = row['Comment']
             prediction = row['Predictions']
+            comment_dict[prediction].append(comment)
 
-            if prediction == 0:
-                list_0.append(comment)
-            elif prediction == 1:
-                list_1.append(comment)
-            elif prediction == 2:
-                list_2.append(comment)
-        common_lists_lenght = len(list_0) + len(list_1) + len (list_2)
-        procents0 = round(len(list_0)/common_lists_lenght*100, 0)
-        procents1 = round(len(list_1)/common_lists_lenght*100, 0)
-        procents2 = round(len(list_2)/common_lists_lenght*100, 0)
-        common_list.append(list_0)
-        common_list.append(list_1)
-        common_list.append(list_2)
-        common_list.append(procents0)
-        common_list.append(procents1)
-        common_list.append(procents2)
+        common_lists_length = sum(len(comment_list) for comment_list in comment_dict.values())
 
-        return JsonResponse(common_list, safe=False)
+        # Используем dictionary comprehension для вычисления процентов
+        percentages = {key: round(len(comment_list) / common_lists_length * 100, 1) for key, comment_list in comment_dict.items()}
+
+        # Добавим проценты в словарь
+        comment_dict['percentages'] = percentages
+
+        return JsonResponse(comment_dict, safe=False)

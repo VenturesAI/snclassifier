@@ -5,7 +5,7 @@ from langdetect import detect
 import re
 from django.conf import settings
 
-CSV_FILE_PATH = "/home/nds/projects/snclassifier/snclassifier/backend/predictions/datasets/comments.csv"
+CSV_FILE_PATH = settings.BASE_DIR / "backend/predictions/datasets/comments.csv"
 
 comments = pd.read_csv(CSV_FILE_PATH)
 
@@ -87,4 +87,4 @@ predictions = learn_2.get_preds(dl=learn_2.dls.test_dl(comment_2["Comment"].iloc
 predicted_classes = predictions[0].argmax(dim=1)
 print(predicted_classes)
 
-learn_2.export('/home/nds/projects/snclassifier/snclassifier/backend/predictions/saved_ml_models/ULMFiT_model.pkl')
+learn_2.export('backend/predictions/saved_ml_models/ULMFiT_model.pkl')
