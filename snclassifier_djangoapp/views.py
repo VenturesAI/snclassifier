@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from django.http import JsonResponse
+from django.http import HttpResponseBadRequest, JsonResponse
 
 from collections import defaultdict
 
@@ -13,7 +13,7 @@ def about(request):
 def contact(request):
     return render(request, "snclassifier_djangoapp/contact.html")
 
-from .parser.parser import get_video_comments
+from .parser.parser import InvalidYoutubeLink, get_video_comments
 from snclassifier_djangoapp.predictions.get_youtube_predictions import YouTubePredictor
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -29,8 +29,11 @@ def process_data(request):
         user_input = data['user_input']
 
         # Process user_input here
-        comments = get_video_comments(user_input)
-        comments = predictor.get_youtube_predictions(comments)
+        try:
+            comments = get_video_comments(user_input)
+            comments = predictor.get_youtube_predictions(comments)
+        except InvalidYoutubeLink as e:
+            return JsonResponse({"error": str(e)}, status=400)
 
         # Using defaultdict for storaging comments depending on predictions
         comment_dict = defaultdict(list)

@@ -6,24 +6,24 @@
     font: 24px/36px sans-serif;
     font-size: 5px;
     border: 2px solid rgb(181, 178, 178);
-    width: 500px;
     height: 1000px;
     overflow-y: scroll;
 }
 
 #container {
     display: flex;
-    flex-wrap: wrap;
-}
-.column {
-    display:flex;
-    flex-direction: column;
+    flex-wrap: nowrap;
 }
 
 .column_title {
     display: flex;
     flex-direction: column;
     text-align: center;
+}
+
+.column {
+    min-width: 200px;
+    width: 520px;
 }
 
 .spinner {

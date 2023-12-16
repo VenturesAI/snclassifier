@@ -3,15 +3,20 @@ import re
 import pandas as pd
 from decouple import config
 
+class InvalidYoutubeLink(Exception):
+    pass
+
 def get_video_comments(youtube_link, max_comments=300):
     # Extract the video ID from the YouTube link
-    video_id = re.search(r'(?<=v=)[^&]+', youtube_link)
-
-    if video_id:
-        video_id = video_id.group(0)
+    if 'youtube.com' in youtube_link:
+        # Link for Web version
+        video_id = youtube_link.split('=')[-1]
+    elif 'youtu.be' in youtube_link:
+        # Link for Mibile version
+        video_id = youtube_link.split('/')[-1].split('?')[0]
     else:
-        # Handle invalid or unsupported YouTube link
-        return []
+        # Other links
+        raise InvalidYoutubeLink("Invalid YouTube link format")
 
     API_KEY = config('API_KEY')
 

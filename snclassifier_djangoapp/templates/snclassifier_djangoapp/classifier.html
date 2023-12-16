@@ -67,7 +67,15 @@
                             },
                             body: JSON.stringify({ user_input: userInput })
                         })
-                        .then(response => response.json())
+                        .then(response => {
+                            const responseJson = response.json();
+                            if (!response.ok) {
+                                return responseJson.then(errorJson => {
+                                    throw new Error(errorJson.error);
+                                });
+                            }
+                            return responseJson;
+                        })
                         .then(data => {
                             // Process the data and update the frontend
                             const negativeDiv = document.getElementById("negativeDiv");
@@ -96,12 +104,33 @@
 
                             document.getElementById("userInput").value = "";
                             hideSpinner();
+                        })
+                        .catch(error => {
+                            hideSpinner();
+                            console.log('Error in catch = ', error.message);
+                            const errorContainer = document.getElementById('errorContainer');
+                            const errorMessageElement = document.getElementById('errorMessage');
+                            errorMessageElement.textContent = error.message;
+                            document.getElementById("errorContainer").style.display = "inline";
+                            setTimeout(() => {
+                                document.getElementById("errorContainer").style.display = "none";
+                            }, 3500);
                         });
                     });
                 });
             </script>
         </head>
         <body>
+
+            <div id="errorContainer" style="position: fixed; top: 12%; left: 50%; transform: translate(-50%, -50%); background-color: #ff5252; padding: 2px; border-radius: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); display: none;">
+                <div style="background-color: #e53935; color: #fff; padding: 10px; border-radius: 5px 5px 0 0;">
+                    <h2 style="margin: 0; font-size: 18px;">Error</h2>
+                </div>
+                <div style="background-color: #fff; color: #333; padding: 10px; border-radius: 0 0 5px 5px;">
+                    <p id="errorMessage" style="margin: 0; font-size: 16px;"></p>
+                </div>
+            </div>
+
             <h1>Youtube classifier</h1>
             <p>Get insights about YouTube English comments sentiment</p>
             <p>Place the YouTube video link in a section below and get comments assessment (negative &#x1F922, neutral &#x1F610, positive &#x1F604) </p>
