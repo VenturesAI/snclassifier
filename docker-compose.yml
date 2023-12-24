@@ -1,0 +1,22 @@
+version: '3'
+services:
+  app:
+    image: snclassifier:latest
+    ports:
+      - "8000:8000"
+    networks:
+      - internal
+  nginx:
+    image: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - internal
+      - external
+    volumes:
+      - ./my_app.conf:/etc/nginx/conf.d/my_app.conf
+networks:
+  internal:
+  external:
+    driver: bridge
