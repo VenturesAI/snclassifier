@@ -6,7 +6,7 @@ from decouple import config
 class InvalidYoutubeLink(Exception):
     pass
 
-def get_video_comments(youtube_link, max_comments=300):
+def get_video_comments(youtube_link, max_comments=100):
     # Extract the video ID from the YouTube link
     if 'youtube.com' in youtube_link:
         # Link for Web version

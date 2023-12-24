@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponseBadRequest, JsonResponse
 
 from collections import defaultdict
+from collections.abc import Iterable
 
 def home(request):
     return render(request, "snclassifier_djangoapp/home.html")
